@@ -189,12 +189,12 @@ const char* const controllerTypeStrings[PSCTRL_MAX + 1] PROGMEM = {
 
 int left_speed = 0, right_speed = 0;
 
-//Motor 1
+// Motor A - Right Motor
 const byte PIN_ENA = 9;
 const byte PIN_IN1 = 8;
 const byte PIN_IN2 = 7;
 
-// Motor B
+// Motor B - Left Motor
 const byte PIN_ENB = 6;
 const byte PIN_IN3 = 5;
 const byte PIN_IN4 = 4;
@@ -221,22 +221,22 @@ void setLeftMotor(int speed) {
 
 	if (left_speed > 0) {
 		// Move forward
-		digitalWrite(PIN_IN1, HIGH);
-    	digitalWrite(PIN_IN2, LOW);
+		digitalWrite(PIN_IN3, LOW);
+    	digitalWrite(PIN_IN4, HIGH);
 		Serial.print (F("Forward: "));
 	} else if (left_speed < 0) {
 		// Move backward
-		digitalWrite(PIN_IN1, LOW);
-    	digitalWrite(PIN_IN2, HIGH);
+		digitalWrite(PIN_IN3, HIGH);
+    	digitalWrite(PIN_IN4, LOW);
 		Serial.print (F("Backward: "));
 	} else {
 		// Stop
-		digitalWrite(PIN_IN1, LOW);
-    	digitalWrite(PIN_IN2, LOW);
+		digitalWrite(PIN_IN3, LOW);
+    	digitalWrite(PIN_IN4, LOW);
 		Serial.print (F("Stop: "));
 	}
 
-	analogWrite(PIN_ENA, abs(left_speed));
+	analogWrite(PIN_ENB, abs(left_speed));
 	Serial.print (abs(left_speed));
 
 }
@@ -253,22 +253,22 @@ void setRightMotor(int speed) {
 
 	if (right_speed > 0) {
 		// Move forward
-		digitalWrite(PIN_IN3, HIGH);
-    	digitalWrite(PIN_IN4, LOW);
+		digitalWrite(PIN_IN1, LOW);
+    	digitalWrite(PIN_IN2, HIGH);
 		Serial.print (F("Forward: "));
 	} else if (right_speed < 0) {
 		// Move backward
-		digitalWrite(PIN_IN3, LOW);
-    	digitalWrite(PIN_IN4, HIGH);
+		digitalWrite(PIN_IN1, HIGH);
+    	digitalWrite(PIN_IN2, LOW);
 		Serial.print (F("Backward: "));
 	} else {
 		// Stop
-		digitalWrite(PIN_IN3, LOW);
-    	digitalWrite(PIN_IN4, LOW);
+		digitalWrite(PIN_IN1, LOW);
+    	digitalWrite(PIN_IN2, LOW);
 		Serial.print (F("Stop: "));
 	}
 
-	analogWrite(PIN_ENB, abs(right_speed));
+	analogWrite(PIN_ENA, abs(right_speed));
 	Serial.println (abs(right_speed));
 }
 
