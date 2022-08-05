@@ -412,6 +412,7 @@ void loop () {
 
 			if (Serial.available() > 0) {
 				// HAVE Serial data
+				// expect <STX><byte><ETX>
 				incomingByte = Serial.read();
 				if (incomingByte == 0x02) { // STX
 					serialCommand = Serial.read();
