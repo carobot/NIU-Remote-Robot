@@ -23,9 +23,10 @@ const firebaseConfig = {
   databaseURL: "https://quick-woodland-357917-default-rtdb.firebaseio.com"
 
 };
-function writeUserData(leftnum, rightnum, shootnum) {
+function writeUserData(leftnum, rightnum, shootnum, camnum) {
     const db = getDatabase();
     set(ref(db, 'data'), {
+      cam: camnum,
       left: leftnum,
       right: rightnum,
       shoot: shootnum
@@ -61,42 +62,52 @@ onAuthStateChanged(auth, user => {
 var R = 0;
 var L = 0;
 var S = 0;
+var cam =0;
 
 window.addEventListener('keydown', e =>{
     console.log(e)
+    // camera 'c'
+    if (e.keyCode === 67) {
+        document.querySelector(".arr.camera").style.backgroundColor ='blue';
+        cam++;
+        if(cam == 5){
+            cam =0;
+        }
+        writeUserData(L, R, S, cam);
+        }
     // right key
     if (e.keyCode === 39) {
         document.querySelector(".arr.right").style.backgroundColor ='blue';
         R = -100;
         L = 100;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
         }
     // left key
     else if (e.keyCode === 37) {
         document.querySelector(".arr.left").style.backgroundColor ='blue';
         R = 100;
         L = -100;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
     // up key
     else if (e.keyCode === 38) {
         document.querySelector(".arr.up").style.backgroundColor ='blue';
         R = 100;
         L = 100;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
     // down key
     else if (e.keyCode === 40) {
         document.querySelector(".arr.down").style.backgroundColor ='blue';
         R = -100;
         L = -100;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
     // s key
     else if (e.keyCode === 83) {
         document.querySelector(".shoot").style.backgroundColor ='blue';
         S = 1;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
 
 })
@@ -108,34 +119,34 @@ window.addEventListener('keyup', e =>{
         document.querySelector(".arr.right").style.backgroundColor ='white';
         R = 0;
         L = 0;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
         }
     // left key
     else if (e.keyCode === 37) {
         document.querySelector(".arr.left").style.backgroundColor ='white';
         R = 0;
         L = 0;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
     // up key
     else if (e.keyCode === 38) {
         document.querySelector(".arr.up").style.backgroundColor ='white';
         R = 0;
         L = 0;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
     // down key
     else if (e.keyCode === 40) {
         document.querySelector(".arr.down").style.backgroundColor ='white';
         R = 0;
         L = 0;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
     // s key
     else if (e.keyCode === 83) {
         document.querySelector(".shoot").style.backgroundColor ='white';
         S = 0;
-        writeUserData(L, R, S);
+        writeUserData(L, R, S, cam);
     }
 
 })
