@@ -287,6 +287,44 @@ void setRightMotor(int speed) {
 	if (debug_mode) Serial.println (abs(right_speed));
 }
 
+void moveForward() {
+	setLeftMotor(150);
+	setRightMotor(150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void moveBackward() {
+	setLeftMotor(-150);
+	setRightMotor(-150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void turnLeft() {
+	setLeftMotor(-150);
+	setRightMotor(150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void turnRight() {
+	setLeftMotor(150);
+	setRightMotor(-150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void shootBubble() {
+	digitalWrite(PIN_BUBBLE_TRIGGER, HIGH);
+	delay(2000);
+	digitalWrite(PIN_BUBBLE_TRIGGER, LOW);
+}
+
 /////////////////////////////////////////////////////////////
 //                      Main Code                          //
 /////////////////////////////////////////////////////////////
@@ -321,6 +359,7 @@ void loop () {
 	static byte slx, sly, srx, sry;
 	static int left_speed_setpoint, right_speed_setpoint;
 	byte trigger_set = 0, bubble_trigger_set = 0, tank_mode = 0;
+	char incomingByte = 0, serialCommand = 0, movementCommand = 0;
 	PsxButtons buttons_pressed = 0;
 
 	// Reading from Joystick start here VVV ////
@@ -370,6 +409,20 @@ void loop () {
 		} else {
       
       	// HAVE Controller AND Input
+
+			if (Serial.available() > 0) {
+				// HAVE Serial data
+				incomingByte = Serial.read();
+				if (incomingByte == 0x02) { // STX
+					serialCommand = Serial.read();
+					incomingByte = Serial.read();
+					if (incomingByte == 0x03) {
+						movementCommand = serialCommand;
+					}
+				} else {
+					while (Serial.read() >= 0);
+				}
+			}
 
 			//fastDigitalWrite (PIN_BUTTONPRESS, !!psx.getButtonWord ());
 			buttons_pressed = psx.getButtonWord ();
@@ -425,6 +478,15 @@ void loop () {
 		// map to 255 raw
 		left_speed_setpoint = left_joystic_y_mapped;
 		right_speed_setpoint = right_joystic_y_mapped;
+	} else if (movementCommand > 0) {
+		switch (movementCommand) {
+			case 'w': moveForward(); break;
+			case 'a': turnLeft(); break;
+			case 's': moveBackward(); break;
+			case 'd': turnRight(); break;
+			case 'q': shootBubble(); break;
+		}
+
 	} else {
 		// // use left joystick only
 		// int left_speed_raw = left_joystic_y_mapped - left_joystic_x_mapped;
