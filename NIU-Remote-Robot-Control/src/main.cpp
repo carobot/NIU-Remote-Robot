@@ -14,8 +14,8 @@ UNO Pin Layout
 					| D8  - Right Motor IN1
 					| D7  - Right Motor IN2
 					| D6* - Left Motor ENB
-				A0 || D5  - Left Motor IN4
-				A1 || D4  - Left Motor IN5
+				A0 || D5  - Left Motor IN3
+				A1 || D4  - Left Motor IN4
 				A2 || D3
 	Trigger -	A3 || D2
 				A4 || D1
@@ -67,13 +67,17 @@ typedef const __FlashStringHelper * FlashStr;
 typedef const byte* PGM_BYTES_P;
 #define PSTR_TO_F(s) reinterpret_cast<const __FlashStringHelper *> (s)
 
+// Are we still debugging?
+// Joystick connection message will always show right now
+boolean debug_mode = false;
+
 /// Joystick Stuff
 
 // This can be changed freely but please see above
 const byte PIN_PS2_ATT = 10;
 
-const byte PIN_BUTTONPRESS = A0;
-const byte PIN_HAVECONTROLLER = A1;
+//const byte PIN_BUTTONPRESS = A0;
+//const byte PIN_HAVECONTROLLER = A1;
 
 const char buttonSelectName[] PROGMEM = "Select";
 const char buttonL3Name[] PROGMEM = "L3";
@@ -200,76 +204,125 @@ const byte PIN_IN3 = 5;
 const byte PIN_IN4 = 4;
 
 const byte PIN_TRIGGER = A3;
+const byte PIN_BUBBLE_TRIGGER = A0;
 
 void setLeftMotor(int speed) {
 
 	// TODO: Add in some kind of ramp
-	// if (speed <= left_speed) {
-	// 	// set motor speed to new speed if speed is lower, safety
-	// 	left_speed = speed;
+	// same dir or zero, higher speed - ramp up
+	// same dir or zero, lower speed - drop
+	// diff dir, reduce to zero
+
+	// if ((speed * left_speed) > 0 || left_speed == 0) {
+	// 	// same direction or zero
 	// } else {
-	// 	// ramp up motor speed
-	// 	left_speed++;
+	// 	// diff dir, reduce to zero
+	// 	if (left_speed > 0) left_speed--;
+	// 	else left_speed++;
 	// }
+
+	speed = constrain(speed, -255, 255);
+
 	if (abs(speed) > 30) {
 		left_speed = speed;
 	} else {
 		left_speed = 0;
 	}
 
-	Serial.print (F("Left: "));
+	if (debug_mode) Serial.print (F("Left: "));
 
 	if (left_speed > 0) {
 		// Move forward
-		digitalWrite(PIN_IN3, LOW);
-    	digitalWrite(PIN_IN4, HIGH);
-		Serial.print (F("Forward: "));
-	} else if (left_speed < 0) {
-		// Move backward
 		digitalWrite(PIN_IN3, HIGH);
     	digitalWrite(PIN_IN4, LOW);
-		Serial.print (F("Backward: "));
+		if (debug_mode) Serial.print (F("Forward: "));
+	} else if (left_speed < 0) {
+		// Move backward
+		digitalWrite(PIN_IN3, LOW);
+    	digitalWrite(PIN_IN4, HIGH);
+		if (debug_mode) Serial.print (F("Backward: "));
 	} else {
 		// Stop
 		digitalWrite(PIN_IN3, LOW);
     	digitalWrite(PIN_IN4, LOW);
-		Serial.print (F("Stop: "));
+		if (debug_mode) Serial.print (F("Stop: "));
 	}
 
 	analogWrite(PIN_ENB, abs(left_speed));
-	Serial.print (abs(left_speed));
+	if (debug_mode) Serial.print (abs(left_speed));
 
 }
 
 void setRightMotor(int speed) {
 	//See above
+
+	speed = constrain(speed, -255, 255);
+
 	if (abs(speed) > 30) {
 		right_speed = speed;
 	} else {
 		right_speed = 0;
 	}
 
-	Serial.print (F(" Right: "));
+	if (debug_mode) Serial.print (F(" Right: "));
 
 	if (right_speed > 0) {
 		// Move forward
-		digitalWrite(PIN_IN1, LOW);
-    	digitalWrite(PIN_IN2, HIGH);
-		Serial.print (F("Forward: "));
-	} else if (right_speed < 0) {
-		// Move backward
 		digitalWrite(PIN_IN1, HIGH);
     	digitalWrite(PIN_IN2, LOW);
-		Serial.print (F("Backward: "));
+		if (debug_mode) Serial.print (F("Forward: "));
+	} else if (right_speed < 0) {
+		// Move backward
+		digitalWrite(PIN_IN1, LOW);
+    	digitalWrite(PIN_IN2, HIGH);
+		if (debug_mode) Serial.print (F("Backward: "));
 	} else {
 		// Stop
 		digitalWrite(PIN_IN1, LOW);
     	digitalWrite(PIN_IN2, LOW);
-		Serial.print (F("Stop: "));
+		if (debug_mode) Serial.print (F("Stop: "));
 	}
 
 	analogWrite(PIN_ENA, abs(right_speed));
-	Serial.println (abs(right_speed));
+	if (debug_mode) Serial.println (abs(right_speed));
+}
+
+void moveForward() {
+	setLeftMotor(150);
+	setRightMotor(150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void moveBackward() {
+	setLeftMotor(-150);
+	setRightMotor(-150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void turnLeft() {
+	setLeftMotor(-150);
+	setRightMotor(150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void turnRight() {
+	setLeftMotor(150);
+	setRightMotor(-150);
+	delay(500);
+	setLeftMotor(0);
+	setRightMotor(0);
+}
+
+void shootBubble() {
+	digitalWrite(PIN_BUBBLE_TRIGGER, HIGH);
+	delay(2000);
+	digitalWrite(PIN_BUBBLE_TRIGGER, LOW);
 }
 
 /////////////////////////////////////////////////////////////
@@ -279,12 +332,12 @@ void setRightMotor(int speed) {
 PsxControllerHwSpi<PIN_PS2_ATT> psx;
 
 boolean haveController = false;
-
-boolean debug_mode = false;
+int maxSpeed = 100;
+int maxTurnSpeed = 75;
 
 void setup () {
-	fastPinMode (PIN_BUTTONPRESS, OUTPUT);
-	fastPinMode (PIN_HAVECONTROLLER, OUTPUT);
+	//fastPinMode (PIN_BUTTONPRESS, OUTPUT);
+	//fastPinMode (PIN_HAVECONTROLLER, OUTPUT);
 
 	fastPinMode (PIN_ENA, OUTPUT);
 	fastPinMode (PIN_IN1, OUTPUT);
@@ -294,6 +347,7 @@ void setup () {
 	fastPinMode (PIN_IN4, OUTPUT);
 
 	fastPinMode (PIN_TRIGGER, OUTPUT);
+	fastPinMode (PIN_BUBBLE_TRIGGER, OUTPUT);
 	
 	delay (300);
 
@@ -304,12 +358,15 @@ void setup () {
 void loop () {
 	static byte slx, sly, srx, sry;
 	static int left_speed_setpoint, right_speed_setpoint;
-	byte trigger_set = 0;
+	byte trigger_set = 0, bubble_trigger_set = 0, tank_mode = 0;
+	char incomingByte = 0, serialCommand = 0, movementCommand = 0;
+	PsxButtons buttons_pressed = 0;
 
 	// Reading from Joystick start here VVV ////
 	
+	//fastDigitalWrite (PIN_HAVECONTROLLER, haveController);
+	
 	// DO NOT MODIFY FROM HERE to ... //
-	fastDigitalWrite (PIN_HAVECONTROLLER, haveController);
 	
 	if (!haveController) {
 		if (psx.begin ()) {
@@ -353,8 +410,31 @@ void loop () {
       
       	// HAVE Controller AND Input
 
-			fastDigitalWrite (PIN_BUTTONPRESS, !!psx.getButtonWord ());
-			if (debug_mode) dumpButtons (psx.getButtonWord ());
+			if (Serial.available() > 0) {
+				// HAVE Serial data
+				// expect <STX><byte><ETX>
+				incomingByte = Serial.read();
+				if (incomingByte == 0x02) { // STX
+					serialCommand = Serial.read();
+					incomingByte = Serial.read();
+					if (incomingByte == 0x03) {
+						movementCommand = serialCommand;
+					}
+				} else {
+					while (Serial.read() >= 0);
+				}
+			}
+
+			//fastDigitalWrite (PIN_BUTTONPRESS, !!psx.getButtonWord ());
+			buttons_pressed = psx.getButtonWord ();
+			if (debug_mode) dumpButtons (buttons_pressed);
+
+			// MSB tp LSB
+			// Square, Cross, Circle, Triangle, R1, L1, R2, L2, Left, Down, Right, Up, Start, R3, L3, Select
+
+			trigger_set = (buttons_pressed & 0b0010000000000000) ? true : false; // circle button
+			bubble_trigger_set = (buttons_pressed & 0b0100000000000000) ? true : false; // cross button
+			tank_mode =   (buttons_pressed & 0b0000010000000000 && buttons_pressed & 0b0000100000000000) ? true : false; // L1 + R1
 
 			byte lx, ly;
 			psx.getLeftAnalog (lx, ly);
@@ -362,7 +442,6 @@ void loop () {
 				if (debug_mode) dumpAnalog ("Left", lx, ly);
 				slx = lx;
 				sly = ly;
-
 			}
 
 			byte rx, ry;
@@ -375,18 +454,75 @@ void loop () {
 		}
 	}
 
+	if (slx > 138 && slx < 118) slx = 128;
+    if (sly > 138 && sly < 118) sly = 128;
+    if (srx > 138 && srx < 118) srx = 128;
+    if (sry > 138 && sry < 118) sry = 128;
+
+	int left_joystic_y_mapped = map(sly, 0, 255, 255, -255);
+	int left_joystic_x_mapped = map(slx, 0, 255, maxTurnSpeed, -maxTurnSpeed);
+	int right_joystic_y_mapped = map(sry, 0, 255, 255, -255);
+	int right_joystic_x_mapped = map(srx, 0, 255, maxTurnSpeed, -maxTurnSpeed);
+
+	if (debug_mode) {
+		Serial.print (F("Mapped: Left Y: "));
+		Serial.print (left_joystic_y_mapped);
+		Serial.print (F(" Left X: "));
+		Serial.print (left_joystic_x_mapped);
+	}
+
 	// Reading from Joystick end here ^^^ ////
 
 	// Motor Control starts here VVV ////
 
-	left_speed_setpoint = map(sly, 0, 255, 255, -255);
-	right_speed_setpoint = map(sry, 0, 255, 255, -255);
+	if (tank_mode) {
+		// map to 255 raw
+		left_speed_setpoint = left_joystic_y_mapped;
+		right_speed_setpoint = right_joystic_y_mapped;
+	} else if (movementCommand > 0) {
+		switch (movementCommand) {
+			case 'w': moveForward(); break;
+			case 'a': turnLeft(); break;
+			case 's': moveBackward(); break;
+			case 'd': turnRight(); break;
+			case 'q': shootBubble(); break;
+		}
+
+	} else {
+		// // use left joystick only
+		// int left_speed_raw = left_joystic_y_mapped - left_joystic_x_mapped;
+		// int right_speed_raw = left_joystic_y_mapped + left_joystic_x_mapped;
+		// if (debug_mode) {
+		// 	Serial.print (F(" Speed RAW: Left: "));
+		// 	Serial.print (left_speed_raw);
+		// 	Serial.print (F(" Right: "));
+		// 	Serial.print (right_speed_raw);
+		// }
+		
+		// // determine max value from calculation above
+		// int speed_scale = max(abs(left_speed_raw), abs(right_speed_raw));
+		// speed_scale = max(255, speed_scale);
+		// if (debug_mode) {
+		// 	Serial.print (F(" Scale: "));
+		// 	Serial.println (speed_scale);
+		// }
+		
+		// left_speed_setpoint = (int) (float) left_speed_raw / (float) speed_scale * 255.0;
+		// right_speed_setpoint = (int) (float) right_speed_raw / (float) speed_scale * 255.0;
+
+		// left_speed_setpoint = map(left_speed_setpoint, -255, 255, -maxSpeed, maxSpeed);
+		// right_speed_setpoint = map(right_speed_setpoint, -255, 255, -maxSpeed, maxSpeed);
+
+		left_speed_setpoint = map(left_joystic_y_mapped, -255, 255, -100, 100);
+		right_speed_setpoint = map(right_joystic_y_mapped, -255, 255, -100, 100);
+	}
 
 	setLeftMotor(left_speed_setpoint);
 	setRightMotor(right_speed_setpoint);
 
-	trigger_set = (psx.getButtonWord () & 0x2000) ? true : false;
-	//Serial.println (psx.getButtonWord ());
+	// Motor Control end here ^^^ ////
+
+	// Trigger Control starts here VVV ///
 
 	if (trigger_set) {
 		digitalWrite(PIN_TRIGGER, HIGH);
@@ -395,7 +531,14 @@ void loop () {
 		digitalWrite(PIN_TRIGGER, LOW);
 	}
 
-	// Motor Control end here ^^^ ////
+	if (bubble_trigger_set) {
+		digitalWrite(PIN_BUBBLE_TRIGGER, HIGH);
+		Serial.println (F("Bubble Trigger!"));
+	} else {
+		digitalWrite(PIN_BUBBLE_TRIGGER, LOW);
+	}
+
+	// Trigger Control end here ^^^ ////
 
 	// the delay might not be necessary if we have a lot of process
 	delay (1000 / 60);
