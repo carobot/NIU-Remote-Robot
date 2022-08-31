@@ -13,7 +13,7 @@ import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.9.1/
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBGxF7-eRsRwxLGNxNvqUWlpY3FYNweUsg",
+  apiKey: "[insertapikey]",
   authDomain: "quick-woodland-357917.firebaseapp.com",
   projectId: "quick-woodland-357917",
   storageBucket: "quick-woodland-357917.appspot.com",
