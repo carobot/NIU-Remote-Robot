@@ -2,7 +2,7 @@ This is a short description of the creation of the physical robot used for the C
 
 The frame of the robot, as well as 2 wheels and motors was taken from a ride-on children’s car. A caster wheel was screwed into a piece of plywood. Then the plywood was screwed to the plastic frame such that the caster replaced the two front wheels as seen below. 
 
-![](https://github.com//carobot/NIU-Remote-Robot/PXL_20220630_161905990 (2).jpg?raw=true)
+![car](https://github.com//carobot/NIU-Remote-Robot/PXL_20220630_161905990(2).jpg?raw=true)
 
 Additional plywood was then added to the interior of the robot to add structural integrity and provide locations to mount the electronics. 
 
