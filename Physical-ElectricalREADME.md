@@ -17,18 +17,18 @@ The electronics portion of the robot was all held within the main cavity of the 
 ![car](./PXL_20220823_170301252.jpg?raw=true)
 
 The electrical components used in this project are:
-1 Raspberry Pi 4
-1 Arduino Uno
-1 pc case fan
-1 voltage regulator
-1 radio receiver
-1 Motor Controller (30 Amp)
-2 120W DC motors 
-2 15 Amp fuses
-3 USB cameras
-1 wireless game controller
-1 power switch
-1 Phone with data plan
+- 1 Raspberry Pi 4
+- 1 Arduino Uno
+- 1 pc case fan
+- 1 voltage regulator
+- 1 radio receiver
+- 1 Motor Controller (30 Amp)
+- 2 120W DC motors 
+- 2 15 Amp fuses
+- 3 USB cameras
+- 1 wireless game controller
+- 1 power switch
+- 1 Phone with data plan
 
 
 The phone provides a mobile hotspot which connects the raspberry pi to the internet. This allows the raspberry pi to interface with a database to receive controls, and stream the USB cameras. The Arduino is connected to the raspberry pi through serial, this allows the raspberry pi to relay the controls to the Arduino. 
