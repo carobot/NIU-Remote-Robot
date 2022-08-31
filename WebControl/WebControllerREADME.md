@@ -2,7 +2,7 @@ The web controller is a set of files to be used as a web page interface for cont
 
 The index.html file is the core of the page and its layout. It makes the title, embedded stream, and each of the control buttons. 
 
-The app.js file is the inner workings of the controller which listens for key strokes, changes the direction values in a firebase database, and makes a visual indication of the key pressed on the webpage.
+The app.js file is the inner workings of the controller which listens for key strokes, changes the direction values in a firebase database, and makes a visual indication of the key pressed on the webpage. This is done with the firebase SDK which several functions are imported from at the top of the file. 
 
 Finally the style.css file determines the details of each object used in the index.html file. This includes things like the button shape, background color, and container spacing. 
 
