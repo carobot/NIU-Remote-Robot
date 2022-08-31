@@ -6,9 +6,15 @@ The frame of the robot, as well as 2 wheels and motors was taken from a ride-on 
 
 Additional plywood was then added to the interior of the robot to add structural integrity and provide locations to mount the electronics. 
 
+![car](./IMG_3420_(1).jpg?raw=true)
+
 Additional frames from the original car were added as supports which zip tied the frame of the doll to such that it stood up straight as seen below.
 
+![car](./IMG_4243.jpg?raw=true)
+
 The electronics portion of the robot was all held within the main cavity of the car. The Robot is powered by a 12V lead acid car battery. For power distribution, we used a power and ground rail to connect between components. For the devices that require lower voltages, such as the raspberry pi and arduino, we used a voltage regulator. The 15A fuses were added in series with each of the motors to prevent damage in case of a short. 
+
+![car](./PXL_20220823_170301252.jpg?raw=true)
 
 The electrical components used in this project are:
 1 Raspberry Pi 4
