@@ -1,6 +1,8 @@
 The retriever.py program is run on the raspberry pi. It interfaces with the database, and conveys information to the Arduino. Additionally, the program streams the USB cameras to the internet. 
 
-The program receives snapshots of the information stored in the database through the reference.get() line of the firebase_admin library. In order to make sure that commands are not repeated, the program stores the states of the database. By comparing the stored values to new snapshots, the program detects if a change has occurred. If a change occurred, the program sends a byte array through the serial port to the Arduino. The array contains 3 bytes. The first being the start of text ASCII code (0x02 in hex) followed by the data (w,a,s, or d for the direction and q for shoot), followed by the end of text ASCII code (0x03 in hex). 
+The program receives snapshots of the information stored in the database through the reference.get() line of the firebase_admin library. In order to make sure that commands are not repeated, the program stores the states of the database. By comparing the stored values to new snapshots, the program detects if a change has occurred. If a change occurred, the program sends a byte array through the serial port to the Arduino. The array contains 3 bytes. The first being the start of text ASCII code (0x02 in hex) followed by the data (w,a,s, or d for the direction and q for shoot), followed by the end of text ASCII code (0x03 in hex).
+
+The JSON file was left out of this GitHub page for security reasons, however it is required in order for the program to navigate through the database and retrive the data from the refrences.
 
 The streaming is slightly unrefined, in that it streams to Youtube. Youtube is not the most optimal streaming service since it has very high latency. Other services are significantly faster, the fastest being hosting an nginx streaming server and receiving the stream without a mediary service. 
 
